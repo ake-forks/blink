@@ -1,4 +1,47 @@
-# Blink Shell for iOS
+# Blink Shell for iOS (Personal Fork)
+
+This is a personal fork of [Blink Shell](https://github.com/blinksh/blink) with changes to build and sideload from source.
+
+## Fork changes
+
+- Pin `swiftui-cached-async-image` SPM dependency to pre-visionOS commit (fixes build on Xcode 26+)
+- Remove restricted entitlements (Font Enumeration, Default Web Browser) that require Apple approval
+- Skip subscription paywall for developer builds
+
+## Build & deploy (command line)
+
+```bash
+# 1. Clone and setup
+git clone --recursive <this-repo> && cd blink
+
+# 2. Configure your developer identity
+cp template_setup.xcconfig developer_setup.xcconfig
+# Edit developer_setup.xcconfig: set TEAM_ID, BUNDLE_ID, GROUP_ID, CLOUD_ID, KEYCHAIN_ID1
+
+# 3. Download xcframeworks
+cd xcfs && swift package resolve && cd ..
+
+# 4. Build
+xcodebuild -project Blink.xcodeproj -scheme Blink \
+  -destination 'generic/platform=iOS' -allowProvisioningUpdates \
+  CODE_SIGN_IDENTITY="Apple Development" DEVELOPMENT_TEAM=<your-team-id> build
+
+# 5. Install to device (find device ID with: xcrun devicectl list devices)
+xcrun devicectl device install app --device <device-id> \
+  ~/Library/Developer/Xcode/DerivedData/Blink-*/Build/Products/Debug-iphoneos/Blink.app
+```
+
+## Sync with upstream
+
+```bash
+git remote add upstream https://github.com/blinksh/blink.git
+git fetch upstream
+git merge upstream/raw
+# Resolve any conflicts in project.pbxproj, Blink.entitlements, EntitlementsManager.swift
+```
+
+---
+
 Do Blink! [Blink](https://blink.sh) is the first professional, desktop-grade terminal for iOS that leverages the support of Mosh and SSH. Thus, we can unequivocally guarantee stable connections, lightning-fast speeds, and full configurations. It can and should be your all-day-long tool.
 
 We did not create another terminal to fix your website on the go. Blink was built as a professional grade product from the onset. We started by analyzing what the must-haves were and we ended up grounding Blink on these three concepts:
