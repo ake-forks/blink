@@ -21,10 +21,11 @@ cp template_setup.xcconfig developer_setup.xcconfig
 # 3. Download xcframeworks
 cd xcfs && swift package resolve && cd ..
 
-# 4. Build
+# 4. Build (ENABLE_DEBUG_DYLIB=NO is required for ios_system's dlsym to find commands)
 xcodebuild -project Blink.xcodeproj -scheme Blink \
   -destination 'generic/platform=iOS' -allowProvisioningUpdates \
-  CODE_SIGN_IDENTITY="Apple Development" DEVELOPMENT_TEAM=<your-team-id> build
+  CODE_SIGN_IDENTITY="Apple Development" DEVELOPMENT_TEAM=<your-team-id> \
+  ENABLE_DEBUG_DYLIB=NO build
 
 # 5. Install to device (find device ID with: xcrun devicectl list devices)
 xcrun devicectl device install app --device <device-id> \
